@@ -35,6 +35,7 @@ function BuscarTarea() {
           <h3>{tareaEncontrada.titulo}</h3>
           <p><strong>Descripción:</strong> {tareaEncontrada.descripcion}</p>
           <p><strong>Prioridad:</strong> {tareaEncontrada.prioridad}</p>
+          <p><strong>Vencimiento:</strong> {tareaEncontrada.fechaVencimiento}</p>
         </div>
       )}
     </div>

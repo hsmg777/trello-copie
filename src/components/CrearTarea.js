@@ -3,7 +3,12 @@ import { agregarTarea } from '../data/tareas';
 import { useNavigate } from 'react-router-dom';
 
 function CrearTarea() {
-  const [tarea, setTarea] = useState({ titulo: '', descripcion: '', prioridad: '' });
+  const [tarea, setTarea] = useState({
+    titulo: '',
+    descripcion: '',
+    prioridad: '',
+    fechaVencimiento: ''
+  });
   const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
 
@@ -12,29 +17,48 @@ function CrearTarea() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); 
+  e.preventDefault();
+  const { titulo, descripcion, prioridad, fechaVencimiento } = tarea;
 
-    const { titulo, descripcion, prioridad } = tarea;
+  if (!titulo || !descripcion || !prioridad || !fechaVencimiento) {
+    setMensaje('Todos los campos son obligatorios.');
+    return;
+  }
 
-    if (!titulo || !descripcion || !prioridad) {
-      setMensaje('Todos los campos son obligatorios.');
-      return;
-    }
+  const regexValido = /^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ.,-]+$/;
 
-    agregarTarea(tarea);
-    setMensaje('✅ Tarea creada con éxito.');
-    setTarea({ titulo: '', descripcion: '', prioridad: '' });
+  if (!regexValido.test(titulo) || !regexValido.test(descripcion)) {
+    setMensaje('❌ No se permiten caracteres especiales en título o descripción.');
+    return;
+  }
 
-    setTimeout(() => {
-      navigate('/');
-    }, 1000);
-  };
+  const fechaFormateada = new Date(fechaVencimiento).toLocaleDateString('es-EC', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+
+  agregarTarea({ ...tarea, fechaVencimiento: fechaFormateada });
+
+  setMensaje('✅ Tarea creada con éxito.');
+  setTarea({
+    titulo: '',
+    descripcion: '',
+    prioridad: '',
+    fechaVencimiento: ''
+  });
+
+  setTimeout(() => {
+    navigate('/');
+  }, 1000);
+};
+
+
 
   return (
     <div style={styles.container}>
       <h2>Crear Tarea</h2>
       <form style={styles.card} onSubmit={handleSubmit}>
-        {/* Ya no se pide el ID */}
         <input
           style={styles.input}
           name="titulo"
@@ -63,6 +87,14 @@ function CrearTarea() {
           <option value="Media">Media</option>
           <option value="Baja">Baja</option>
         </select>
+        <input
+          type="date"
+          name="fechaVencimiento"
+          style={styles.input}
+          value={tarea.fechaVencimiento}
+          onChange={handleChange}
+          required
+        />
         <button type="submit" style={styles.button}>Agregar Tarea</button>
         {mensaje && <p>{mensaje}</p>}
       </form>
